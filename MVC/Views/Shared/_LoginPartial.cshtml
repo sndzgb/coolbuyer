@@ -1,0 +1,40 @@
+﻿@{
+    var username = ((@CoolBuyer.Client.Common.ClientModels.CBPrincipal.ICoolBuyerPrincipal)User).Username;
+}
+
+@if (Request.IsAuthenticated)
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown" style="text-align:center;">
+            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span> &#9660;</span> Hello, @username!</a>
+            <ul class="dropdown-menu" aria-labelledby="more" style="background-color:#222222;text-align:center;">
+                <li><a href="#" class="anchor-disabled">Account</a></li>
+                <li><a href="#" class="anchor-disabled">Favorites</a></li>
+                <li><a href="#" class="anchor-disabled">Commented Products</a></li>
+                <li><a href="#" class="anchor-disabled">My Products</a></li>
+                <li><a href="#" class="anchor-disabled">Manage</a></li>
+                <li><a href="/products/create">Create New Product</a></li>
+                <li class="divider"></li>
+                @using (Html.BeginForm("logout", "account", FormMethod.Post, new { id = "logoutForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="submit" value="Logout" style="color:white;background: none;border: none;padding: 0;
+                        font: inherit;cursor: pointer;outline: inherit;" />
+                }
+            </ul>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right" style="text-align:center;">
+        <li class="dropdown">
+            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span>&#10729;</span> More</a>
+            <ul class="dropdown-menu" aria-labelledby="more" style="background-color:#222222;text-align:center;">
+                <li><a href="/products/create"><span class="glyphicon glyphicon-plus-sign"></span> Add new product</a></li>
+            </ul>
+        </li>
+        <li><a href="/account/register" id="signUpAction"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+        <li><a href="/account/login" id="loginAction"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+    </ul>
+}

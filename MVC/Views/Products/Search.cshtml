@@ -1,0 +1,310 @@
+﻿@model CoolBuyer.Client.Common.ClientModels.Products.ProductsSearchViewModel
+
+@{
+    ViewBag.Title = "Search";
+}
+
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2" style="padding:0px;">
+        <h1>Search results for: <span>"@Model.SearchOptions.SearchString"</span></h1>
+        <hr />
+    </div>
+</div>
+
+<!-- #region searchForm -->
+<div class="row">
+    <form id="searchForm" action="/products/search" class="form-horizontal" method="get">
+        <div class="col-lg-10 col-lg-offset-1" style="padding-top:15px;background-color:rgb(219, 222, 223)">
+            <label style="margin:5px 0px 5px 0px;" for="minProductPrice" class="col-lg-2 control-label">Min Price: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-2 col-xs-9">
+                <input type="text" class="form-control" id="minProductPrice" name="minPrice" value="@(Model.SearchOptions.MinPrice == null ? null : Model.SearchOptions.MinPrice)">
+            </div>
+            <label style="margin:5px 0px 5px 0px;" for="maxProductPrice" class="col-lg-2 control-label">Max Price: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-2 col-xs-9">
+                <input type="text" class="form-control" id="maxProductPrice" name="maxPrice" value="@(Model.SearchOptions.MaxPrice == null ? null : Model.SearchOptions.MaxPrice)">
+            </div>
+            <label style="margin:5px 0px 5px 0px;" for="takeItems" class="col-lg-2 control-label">Items per page: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-2 col-xs-9">
+                <select class="form-control" id="takeItems" name="take">
+                    <option selected="@(Model.Pagination.PageSize == 10 ? "selected" : null)">10</option>
+                    <option selected="@(Model.Pagination.PageSize == 15 ? "selected" : null)">15</option>
+                    <option selected="@(Model.Pagination.PageSize == 20 ? "selected" : null)">20</option>
+                </select>
+            </div>
+
+            <label style="margin:5px 0px 5px 0px;" for="jumpToPage" class="col-lg-2 control-label">Jump to page: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-2 col-xs-9">
+                <input type="number" value="@((Model.Pagination.TotalPages == 0) || (Model.Pagination.TotalPages == 1) ? 1 : Model.Pagination.CurrentPage)"
+                       min="1"
+                       max="@(Model.Pagination.TotalPages == 0 ? 1 : Model.Pagination.TotalPages)"
+                       class="form-control" id="jumpToPage" name="page">
+            </div>
+
+            <label style="margin:5px 0px 5px 0px;" for="sortResults" class="col-lg-2 control-label">Sort by: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-2 col-xs-9">
+                <select class="form-control" id="sortResults" name="sortBy">
+                    <option selected="@(Model.SearchOptions.SortBy == "Price_Asc" ? "selected" : null)" value="Price_Asc">Price Asc &#11115;</option>
+                    <option selected="@(Model.SearchOptions.SortBy == "Price_Desc" ? "selected" : null)" value="Price_Desc">Price Desc &#11117;</option>
+                    <option selected="@(Model.SearchOptions.SortBy == "Date_Asc" ? "selected" : null)" value="Date_Asc">Date Asc &#11115;</option>
+                    <option selected="@(Model.SearchOptions.SortBy == "Date_Desc" ? "selected" : null)" value="Date_Desc">Date Desc &#11117;</option>
+                </select>
+            </div>
+
+            <div class="clearfix">
+            </div>
+
+            <label style="margin:5px 0px 5px 0px;" for="searchQuery" class="col-lg-2 control-label">Search query: </label>
+            <div style="margin:5px 0px 5px 0px;" class="col-lg-4 col-xs-9">
+                <input type="text" class="form-control" id="searchQuery" name="searchString" value="@(Model.SearchOptions.SearchString == null ? null : Model.SearchOptions.SearchString)">
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="col-lg-12" style="text-align:center;">
+                <label style="text-decoration:none; margin-top:10px;margin-bottom:10px;cursor:pointer;" id="showAdditionalFilters">Search in specific category <span>&#9207;</span></label>
+
+                <div id="additionalCategories" style="display:none;" class="col-lg-12">
+                    @foreach (var item in Model.Stats.CategoryTotals)
+                    {
+                        <div class="col-lg-10 col-lg-offset-1">
+                            <a style="text-decoration:none;"
+                               href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.SearchOptions.Page)&sortBy=@(Model.SearchOptions.SortBy)@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")&categoryId=@item.CategoryId">
+                                <b>
+                                    @item.CategoryName
+                                </b>
+                            </a>
+                        </div>
+
+                        <div class="col-lg-10 col-lg-offset-1">
+                            @foreach (var subc in Model.Stats.SubcategoryTotals.Where(x => x.CategoryId == item.CategoryId))
+                            {
+                                <span>&nbsp;</span>
+                                <a style="text-decoration:none;"
+                                   href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.SearchOptions.Page)&sortBy=@(Model.SearchOptions.SortBy)@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")&categoryId=@item.CategoryId&subcategoryId=@subc.SubcategoryId">
+                                    @(String.Format("{0}", subc.SubcategoryName))
+                                </a>
+                                <span>&nbsp;</span>
+                                
+                                if (Model.Stats.SectionTotals.Where(s => s.SubcategoryId == subc.SubcategoryId).Count() > 0)
+                                {
+                                    <div class="col-lg-10 col-lg-offset-1">
+                                        @foreach (var sec in Model.Stats.SectionTotals)
+                                        {
+                                            <span>&nbsp;</span>
+                                            <a style="text-decoration:none;"
+                                               href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.SearchOptions.Page)&sortBy=@(Model.SearchOptions.SortBy)@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")&categoryId=@item.CategoryId&subcategoryId=@subc.SubcategoryId&sectionId=@sec.SectionId">
+                                                @(String.Format("{0}", sec.Name))
+                                            </a>
+                                            <span>&nbsp;</span>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div style="margin-top:15px;text-align:center;" class="col-lg-2 col-lg-offset-5 col-xs-offset-3 col-xs-9">
+                    <button type="submit" class="btn btn-primary">Search &#9166;</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<!-- #endregion -->
+
+<div class="row">
+    <div class="col-lg-10 col-lg-offset-1" style="padding:15px 0 15px 15px;">
+        <b>Search results: </b><span style="text-decoration:underline;">@Model.Stats.TotalItemsFound</span> matching items found
+    </div>
+</div>
+
+
+<!-- #region product details -->
+@foreach (var product in Model.Products)
+{
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1" style="border:1px solid #bbb1b1;padding:15px;">
+            <div class="col-lg-3" style="text-align:center;height:280px;position: relative;">
+                <img style="max-height: 280px;max-width: 100%;width: auto;height: auto;position: absolute;top: 0;bottom: 0;left: 0;right: 0;margin: auto;"
+                     src="@(product.ProductThumbnailImage ?? "/Resources/cool-buyer-logo.png")">
+            </div>
+            <div class="col-lg-9" style="min-height:280px;padding-left:0px;">
+                <div class="col-lg-11" id="@(product.ProductId)" style="padding-bottom:15px;">
+                    <b>
+                        <a href="/products/details/@product.ProductId">@product.Title</a>
+                    </b>
+                </div>
+                <div class="col-lg-11 col-sm-8 prodDesc" style="height:140px;min-height: 140px; overflow: auto; resize: vertical;">
+                    @Html.Raw(product.Description)
+                </div>
+                <div class="col-lg-11" style="text-align:center;padding-top:10px;">
+                    <div class="col-lg-6">
+                        <b>Active Date: </b>@product.ExpirationDate
+                        <br>
+                        <b>Posted Date: </b>@product.PostedDate
+                        <br>
+                        <b>Price: </b>@product.Price
+                    </div>
+                    <div class="col-lg-6">
+                        <b>Posted By: <a href="/users/details/@(product.UserId)">@product.Username</a></b>
+                        <label>
+                            @if (product.IsAccountConfirmed)
+                            {
+                                <span title="Verified account">&#9989;</span>
+                            }
+                            else
+                            {
+                                <span title="Account not verified">&#10060;</span>
+                            }
+                        </label>
+                        <br />
+                        <span class="glyphicon glyphicon-thumbs-up"></span> @product.TotalLikes <span>&#9125;</span>
+                        <span class="glyphicon glyphicon-thumbs-down"></span> @product.TotalDislikes <span>&#9125;</span>
+                        <span class="glyphicon glyphicon-comment"></span> @product.TotalComments<br>
+
+                        <div class="col-lg-10 col-lg-offset-1">
+                            <div class="progress" style="height:5px;vertical-align:baseline;margin-top:10px;">
+                                @if (product.TotalLikes == 0 && product.TotalDislikes == 0)
+                                {
+                                    <div class="progress-bar progress-bar-info" role="progressbar" style="width:100%;">
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="progress-bar progress-bar-success" role="progressbar" style="width:@(Math.Round(((float)product.TotalLikes / (float)(product.TotalLikes + product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                                    </div>
+                                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width:@(Math.Round(((float)product.TotalDislikes / (float)(product.TotalLikes + product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="position: absolute; right: 0px; top: 10px;" class="col-lg-1 col-sm-1 expandContent">
+                    <label style="text-decoration:none;cursor: pointer;">
+                        <span>&#11174;</span> Open
+                    </label>
+                </div>
+                <div style="position: absolute; right: 0px; bottom: 10px;" class="col-lg-1 col-sm-1 shrinkContent">
+                    <label style="text-decoration:none;cursor: pointer;">
+                        <span>&#11172;</span> Close
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<!-- #endregion -->
+
+<!-- #region Pagination -->
+@if (Model.Pagination.EndPage > 0)
+{
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1" style="text-align:center;">
+            <ul class="pagination">
+                @if (Model.Pagination.CurrentPage > 1)
+                {
+                    <li>
+                        <a href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=1@(Model.SearchOptions.SortBy == null ? "" : $"&sortBy={Model.SearchOptions.SortBy}")@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")@(Model.SearchOptions.CategoryId == null ? "" : $"&categoryId={Model.SearchOptions.CategoryId}")@(Model.SearchOptions.SubcategoryId == null ? "" : $"&subcategoryId={Model.SearchOptions.SubcategoryId}")@(Model.SearchOptions.SectionId == null ? "" : $"&sectionId={Model.SearchOptions.SectionId}")">
+                            First
+                        </a>
+                    </li>
+                    <li>
+                        <a href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.Pagination.CurrentPage - 1)@(Model.SearchOptions.SortBy == null ? "" : $"&sortBy={Model.SearchOptions.SortBy}")@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")@(Model.SearchOptions.CategoryId == null ? "" : $"&categoryId={Model.SearchOptions.CategoryId}")@(Model.SearchOptions.SubcategoryId == null ? "" : $"&subcategoryId={Model.SearchOptions.SubcategoryId}")@(Model.SearchOptions.SectionId == null ? "" : $"&sectionId={Model.SearchOptions.SectionId}")">
+                            Previous
+                        </a>
+                    </li>
+                }
+
+                @for (var page = Model.Pagination.StartPage; page <= Model.Pagination.EndPage; page++)
+                {
+                    <li class="@(page == Model.Pagination.CurrentPage ? "active" : "")">
+                        <a href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@page@(Model.SearchOptions.SortBy == null ? "" : $"&sortBy={Model.SearchOptions.SortBy}")@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")@(Model.SearchOptions.CategoryId == null ? "" : $"&categoryId={Model.SearchOptions.CategoryId}")@(Model.SearchOptions.SubcategoryId == null ? "" : $"&subcategoryId={Model.SearchOptions.SubcategoryId}")@(Model.SearchOptions.SectionId == null ? "" : $"&sectionId={Model.SearchOptions.SectionId}")">
+                            @page
+                        </a>
+                    </li>
+                }
+
+                @if (Model.Pagination.CurrentPage < Model.Pagination.TotalPages)
+                {
+                    <li>
+                        <a href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.Pagination.CurrentPage + 1)@(Model.SearchOptions.SortBy == null ? "" : $"&sortBy={Model.SearchOptions.SortBy}")@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")@(Model.SearchOptions.CategoryId == null ? "" : $"&categoryId={Model.SearchOptions.CategoryId}")@(Model.SearchOptions.SubcategoryId == null ? "" : $"&subcategoryId={Model.SearchOptions.SubcategoryId}")@(Model.SearchOptions.SectionId == null ? "" : $"&sectionId={Model.SearchOptions.SectionId}")">
+                            Next
+                        </a>
+                    </li>
+                    <li>
+                        <a href="~/products/search?searchString=@(Model.SearchOptions.SearchString)&take=@(Model.SearchOptions.Take)&page=@(Model.Pagination.TotalPages)@(Model.SearchOptions.SortBy == null ? "" : $"&sortBy={Model.SearchOptions.SortBy}")@(Model.SearchOptions.MinPrice == null ? "" : $"&minPrice={Model.SearchOptions.MinPrice}")@(Model.SearchOptions.MaxPrice == null ? "" : $"&maxPrice={Model.SearchOptions.MaxPrice}")@(Model.SearchOptions.CategoryId == null ? "" : $"&categoryId={Model.SearchOptions.CategoryId}")@(Model.SearchOptions.SubcategoryId == null ? "" : $"&subcategoryId={Model.SearchOptions.SubcategoryId}")@(Model.SearchOptions.SectionId == null ? "" : $"&sectionId={Model.SearchOptions.SectionId}")">
+                            Last
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+}
+<!-- #endregion -->
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    @* show additional categories filter *@
+    <script>
+        $("#showAdditionalFilters").click(function () {
+            $("#additionalCategories").toggle();
+        });
+    </script>
+
+    @* remove empty input fields *@
+    <script>
+        $(function () {
+            $('#searchForm').submit(function () {
+
+                $("#jumpToPage").val('1');
+
+                var $empty_fields = $(this).find(':input').filter(function () {
+                    return $(this).val() === '';
+                });
+                $empty_fields.prop('disabled', true);
+                return true;
+            });
+        });
+    </script>
+
+    @*set initial "height" for each "description" section*@
+    <script>
+        $(document).ready(function () {
+            $(".prodParag").each(function (index) {
+                var h = ($(this)[0].scrollHeight);
+                $(this).css("max-height", h);
+            });
+        })
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(".prodDesc").each(function (index) {
+                var h = ($(this)[0].scrollHeight);
+                var h2 = h + 2;
+                $(this).css("max-height", h + 2);
+                var mh = $(this).css("min-height").replace('px', '');
+                var m2 = mh + 2;
+                var r = parseInt(mh) + 2;
+                if (h2 <= r) {
+                    $(this).css("resize", "none");
+                    //
+                    $(this).parent().children(".expandContent").css("display", "none");
+                    $(this).parent().children(".shrinkContent").css("display", "none");
+                } else {
+                    $(this).parent().children(".expandContent").css("display", "");
+                }
+            });
+        })
+    </script>
+
+}

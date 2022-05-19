@@ -1,0 +1,105 @@
+﻿@model CoolBuyer.Client.Common.ClientModels.Products.IndexPageProductDetailsViewModel
+
+@{
+    ViewBag.Title = "Welcome to Cool Buyer!";
+}
+
+<div style="text-align:center;">
+    <h2 style="font-family:Broadway;">Cool Buyer</h2>
+</div>
+
+@if (!Request.IsAuthenticated)
+{
+    <br />
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        Welcome to CoolBuyer! If you are not registered, please click <a style="text-decoration:underline;" href="/account/register">here</a> to register. If you are already a member, log in by clicking <a style="text-decoration:underline;" href="/account/login">here</a>! Enjoy your stay!
+    </div>
+}
+
+<hr />
+
+<div id="myModal" class="modal">
+    <img class="modal-content" id="img01">
+</div>
+
+
+@foreach (var c in Model.Categories)
+{
+    <div class="container-fluid">
+        <div class="col-lg-2 col-md-2 col-xs-4" style="margin:10px 0px 10px 0px;border:3px solid #14c414; height: 150px; max-height: 150px;min-height: 150px;border-radius:10px;text-align:center;position:relative;">
+            <img src="/Resources/cool-buyer-logo.png" style="height:70%;width:70%;position:absolute;top:15px;left:0;right:0;margin:auto;" />
+            <br />
+            <label style="position:absolute;margin:auto;bottom:10px;left:0;right:0">@c.CategoryName</label>
+        </div>
+        <div class="col-lg-10 col-md-10 col-xs-8">
+            <div class="row flex-row flex-nowrap" style="overflow-x:auto;margin:10px 0px 10px 0px;">
+                @foreach (var p in c.Products)
+                {
+                    if (p.Title == null)
+                    {
+                        <div style="display: flex;justify-content: center;align-items: center;height: 150px;max-height: 150px;min-height: 150px;width: 100%;border: 3px solid #14c414;border-radius:10px;">
+                            <p>
+                                No active products for this category. Go <a href="/products/create">here</a> and add one!
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="lg-screen md-screen xs-screen">
+                            <div class="well" style="padding-top:10px; white-space: nowrap; overflow: hidden;overflow-x:scroll;text-align:center;">
+                                <a href="/products/details/@p.ProductId" stype="border:3px solid red; max-width:150px;">
+                                    @p.Title
+                                </a>
+                                <div style="position:relative; width:90px;height:90px;margin:auto;top:0;bottom:0;left:0;right:0;">
+                                    <img class="zoom thmbImg" id="@p.ProductId" src="@(p.ProductThumbnailURI != null ? p.ProductThumbnailURI : "/Resources/cool-buyer-logo.png")" style="z-index:10; height:100%;width:100%;position:absolute;bottom:0px;left:0;right:0;margin:auto;" />
+                                    <img class="zoom" src="https://cdn.pixabay.com/photo/2015/12/08/17/40/magnifying-glass-1083378__340.png"
+                                         style="z-index:20; height:20px;width:20px;position:absolute;bottom:5px;left:5px;" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+}
+
+<div class="clearfix">
+</div>
+
+@section scripts
+{
+<script>
+        $(document).ready(function () {
+            $(".thmbImg").click(function () {
+                var imgId = $(this).attr("id");
+                console.log(imgId);
+
+                var modal = document.getElementById("myModal");
+                console.log(modal);
+                var modalImg = document.getElementById("img01");
+                console.log(modalImg);
+                modal.style.display = "block";
+                modalImg.src = this.src;
+                var span = document.getElementsByClassName("close")[0];
+                span.onclick = function () {
+                    modal.style.display = "none";
+                }
+            })
+
+            $("#myModal").click(function () {
+                $(this).toggle();
+            })
+
+            $(".thmbImg").mouseover(function () {
+                $(this).css("opacity", "0.7");
+
+                $(this).mouseleave(function () {
+                    $(this).css("opacity", "1");
+                });
+            })
+        })
+</script>
+}

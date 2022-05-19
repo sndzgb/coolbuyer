@@ -1,0 +1,589 @@
+﻿@model CoolBuyer.Client.Common.ClientModels.Products.ProductDetailsViewModel
+
+@{
+    ViewBag.Title = Model.Product.Title;
+}
+
+<div id="mainMsgPanel">
+    
+</div>
+
+@if (Model.Product.ExpirationDate < DateTime.UtcNow)
+{
+    <br />
+    <div class="alert alert-info" role="alert">
+        <span class="glyphicon glyphicon-info-sign">
+        </span>
+        <span style="padding:0 0 0 5px;">
+            This product is not active.
+        </span>
+    </div>
+    <hr />
+}
+
+
+@using (Html.BeginForm("add-remove", "favorites", FormMethod.Post, new { id = "favoriteForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <p style="display:none;" id="isProductFavorited">@Model.Product.IsFavorited.ToString().ToLower()</p>
+    
+    <div class="row">
+        <div class="col-lg-1 col-sm-1 col-xs-2" style="text-align:right;padding:0 10px 0px 0;">
+            <h3 style="margin-top:10px;">
+                <button type="submit" id="favoriteItem" class="btn btn-link" value="@Model.Product.ProductId">
+                    <span id="favoriteIcon" style="font-size: 30px;color:#e25353;" class="@(Model.Product.IsFavorited ? "glyphicon glyphicon-heart" : "glyphicon glyphicon-heart-empty")"></span>
+                </button>
+            </h3>
+        </div>
+        <div class="col-lg-10 col-sm-10 col-xs-10" style="padding:0px;">
+            <h3><b>@Model.Product.Title</b></h3>
+        </div>
+    </div>
+}
+
+<label id="viewProductId" hidden>@Model.Product.ProductId</label>
+
+<hr style="margin-top:0px;" />
+
+<div class="row">
+    <div class="col-lg-6 col-lg-offset-3 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12">
+        <div id="my-pics" class="carousel slide" data-ride="carousel" data-interval="false">
+            <ol class="carousel-indicators">
+                @if (Model.Images.Count > 0)
+                {
+                    for (int i = 0; i < Model.Images.Count(); i++)
+                    {
+                        if (i == 0)
+                        {
+                            <li data-target="#my-pics" data-slide-to="@i" class="active"></li>
+                        }
+                        else
+                        {
+                            <li data-target="#my-pics" data-slide-to="@i"></li>
+                        }
+                    }
+                }
+                else
+                {
+                    <li data-target="#my-pics" data-slide-to="0" class="active"></li>
+                }
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                @if (Model.Images.Count > 0)
+                {
+                    for (int i = 0; i < Model.Images.Count(); i++)
+                    {
+                        if (i == 0)
+                        {
+                            <div class="item active" style="height:350px;">
+                                <img src="@Model.Images[i].Uri" alt="@Model.Images[i].Name" style="margin:auto;height:100%;">
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="item" style="height:350px;">
+                                <img src="@Model.Images[i].Uri" alt="@Model.Images[i].Name" style="margin:auto;height:100%;">
+                            </div>
+                        }
+                    }
+                }
+                else
+                {
+                    <div class="item active" style="height:350px;">
+                        <img src="\Resources\cool-buyer-logo.png" alt="Sunset over beach" style="margin:auto;height:100%;">
+                    </div>
+                }
+
+            </div>
+            <a class="left carousel-control" href="#my-pics" role="button" data-slide="prev">
+                <span class="icon-prev" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#my-pics" role="button" data-slide="next">
+                <span class="icon-next" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-lg-2 col-lg-offset-5 col-md-6 col-xs-6" style="text-align:center;">
+        <p><span style="color:lightgreen;">+@Model.Product.TotalLikes</span> / <span style="color:red;">-@Model.Product.TotalDislikes</span></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-2 col-lg-offset-5 col-sm-8 col-sm-offset-2">
+        <div class="progress" style="height:5px;">
+            @if (Model.Product.TotalLikes == 0 && Model.Product.TotalDislikes == 0)
+            {
+                <div class="progress-bar progress-bar-info" role="progressbar" style="width:100%;">
+                </div>
+            }
+            else
+            {
+                <div class="progress-bar progress-bar-success" role="progressbar" style="width:@(Math.Round(((float)Model.Product.TotalLikes / (float)(Model.Product.TotalLikes + Model.Product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                </div>
+                <div class="progress-bar progress-bar-danger" role="progressbar" style="width:@(Math.Round(((float)Model.Product.TotalDislikes / (float)(Model.Product.TotalLikes + Model.Product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-lg-4 col-lg-offset-4" style="text-align:center;">
+        
+        <label id="productLikeButton" style="cursor:pointer;padding:10px;border-radius:5px;border:1px solid #ffffff;@(Model.Product.LikeDislike == true ? "background-color:#00ff90;" : "");">
+            <span class="glyphicon glyphicon-thumbs-up">
+            </span>
+            LIKE
+        </label>
+        <label id="productDislikeButton" style="cursor:pointer;padding:10px;border-radius:5px;border:1px solid #ffffff;@(Model.Product.LikeDislike == false ? "background-color:#ff0000;" : "");">
+            <span class="glyphicon glyphicon-thumbs-down">
+            </span>
+            DISLIKE
+        </label>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 col-xs-12">
+        @Html.LabelFor(x => x.Product.TotalTimesFavorited, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p id="totalFavorites">@(Model.Product.TotalTimesFavorited)</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-xs-12">
+        @Html.LabelFor(x => x.Product.TotalComments, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@(Model.Product.TotalComments)</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 col-xs-12">
+        @Html.LabelFor(x => x.Product.ExpirationDate, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@(Model.Product.ExpirationDate)</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-xs-12">
+        @Html.LabelFor(x => x.Product.LastUpdated, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@(Model.Product.LastUpdated.ToString() == "" ? "-" : Model.Product.LastUpdated.ToString())</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 col-xs-12">
+        @Html.LabelFor(x => x.Product.TotalLikes, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@(Model.Product.TotalLikes)</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-xs-12">
+        @Html.LabelFor(x => x.Product.TotalDislikes, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@(Model.Product.TotalDislikes)</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 col-lg-offset-2 col-md-4 col-md-offset-2 col-xs-12">
+        @Html.LabelFor(x => x.Product.Price, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            <p>@Model.Product.Price</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4 col-md-4 col-xs-12">
+        @Html.LabelFor(x => x.Product.PostedDate, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+            @Html.DisplayTextFor(x => x.Product.PostedDate)
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-lg-10 col-lg-offset-1" style="border-radius:5px;padding-top:10px;padding-bottom:20px;">
+        @Html.Raw(Model.Product.Description)
+    </div>
+</div>
+
+<hr />
+
+
+<div class="row" id="commentSection">
+</div>
+
+<hr />
+
+    <div class="row" style="text-align:center;">
+
+        <div class="col-lg-6 col-md-6" style="padding:15px;">
+            <div class="col-lg-12" style="border-radius:5px;min-height:188px;border:1px solid #808080;">
+                <p style="margin-left:50px; text-align:left;text-decoration: underline;padding-top:10px;"><b>User Details</b></p>
+                <div style="width:25%;height:110px;margin:auto;">
+                    <img style="width:100%;height:100%;" src="~/Resources/cool-buyer-logo.png" />
+                </div>
+                <div style="margin-top:5px;">
+                    <label><b>Username: </b></label>
+                    <a href="/users/details/@Model.Product.UserId">@Model.Product.Username </a><span class="glyphicon glyphicon-ok" style="color:#16b72b;"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6" style="padding:15px;">
+            <div class="col-lg-12" style="border-radius:5px;min-height:188px;border:1px solid #808080;">
+                <p style="margin-left:50px; text-align:left;text-decoration: underline;padding-top:10px;"><b>Product Info</b></p>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12">
+                        @Html.LabelFor(x => x.Product.LastUpdated, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+                        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+                            @if (Model.Product.LastUpdated == null)
+                            {
+                                <p>-</p>
+                            }
+                            else
+                            {
+                                <p>@Model.Product.LastUpdated</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12">
+                        @Html.LabelFor(x => x.Product.PostedDate, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+                        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+                            <p>@Model.Product.PostedDate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12">
+                        @Html.LabelFor(x => x.Product.ExpirationDate, new { @class = "col-lg-6 col-md-6 col-xs-6 control-label", @style = "text-align:right;" })
+                        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+                            <p>@Model.Product.ExpirationDate</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12">
+                        <label class="col-lg-6 col-md-6 col-xs-6 control-label" style="text-align:right;"><b>Total Reactions</b></label>
+                        <div class="col-lg-6 col-md-6 col-xs-6" style="text-align:left;">
+                            <p><span style="color:lightgreen;">+@Model.Product.TotalLikes</span> / <span style="color:red;">-@Model.Product.TotalDislikes</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8 col-lg-offset-2 col-sm-8 col-sm-offset-2">
+                        <div class="progress" style="height:5px;">
+                            @if (Model.Product.TotalLikes == 0 && Model.Product.TotalDislikes == 0)
+                            {
+                                <div class="progress-bar progress-bar-info" role="progressbar" style="width:100%;">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="progress-bar progress-bar-success" role="progressbar" style="width:@(Math.Round(((float)Model.Product.TotalLikes / (float)(Model.Product.TotalLikes + Model.Product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                                </div>
+                                <div class="progress-bar progress-bar-danger" role="progressbar" style="width:@(Math.Round(((float)Model.Product.TotalDislikes / (float)(Model.Product.TotalLikes + Model.Product.TotalDislikes)) * 100, 3).ToString().Replace(',', '.'))%;">
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+@section scripts{
+<script>
+
+    $(document).ready(function () {
+        var request;
+
+        $('#favoriteForm').submit(function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            if (request) {
+                request.abort();
+            }
+
+            var btnSubmit = $("#favoriteItem").attr("disabled", true);
+            var form = $('#favoriteForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            var favRes = $('#isProductFavorited').html();
+            var prodctId = @Model.Product.ProductId;
+            
+            request = $.ajax({
+                url: '/favorites/add-remove',
+                type: 'POST',
+                data: { 
+                    __RequestVerificationToken: token,
+                    ProductId: prodctId
+                }
+            });
+            request.done(function (result) {
+                console.log("SUCCESS");
+                if ($('#favoriteIcon').hasClass("glyphicon-heart-empty")) {
+                    $('#favoriteIcon').removeClass("glyphicon-heart-empty");
+                    $('#favoriteIcon').addClass("glyphicon-heart");
+                } else {
+                    $('#favoriteIcon').addClass("glyphicon-heart-empty");
+                    $('#favoriteIcon').removeClass("glyphicon-heart");
+                }
+                var favOrNot = $('#isProductFavorited').text();
+
+                if (favOrNot == 'true') {
+                    $("#isProductFavorited").text('false');
+
+                    var x = parseInt($("#totalFavorites").text());
+                    $("#totalFavorites").text(x - 1);
+
+                } else if (favOrNot == 'false') {
+                    $("#isProductFavorited").text('true');
+
+                    var x = parseInt($("#totalFavorites").text());
+                    $("#totalFavorites").text(x + 1);
+                }
+            });
+            request.fail(function (jqXHR, textStatus, errorThrown) {
+                $('#mainMsgPanel').html(' \
+                        <div class="alert alert-danger alert-dismissible" style="margin-top:20px;" role="alert" id="errorAlertMsg"> \
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button> \
+                        <p><strong>' + jqXHR.responseJSON.ErrorMessage + '</strong></p> \
+                    </div> \
+                ');
+            });
+            request.always(function () {
+                    var btnSubmit = $("#favoriteItem").attr("disabled", false);
+                }
+            );
+            
+            return false;
+        });
+    })
+
+
+
+
+        $(document).ready(function () {
+            initialGetComments();
+        })
+
+        // append loading
+        function appendLoadingInfo(elementId) {
+            $("#" + elementId).append(
+                "<br/><div style=\"text-align: center;\" id=\"loadingCommentsInfo\">" +
+                    "<label id=\"loadingCommentsComment\">Fetching comments...</label><br/>" +
+                    "<img id=\"loadingCommentsGif\" src=\"https://c.tenor.com/5o2p0tH5LFQAAAAi/hug.gif\" style=\"height:35px;width:35px;\" />" +
+                "</div>"
+            );
+        }
+
+        // remove loading
+        function removeLoadingInfo() {
+            $("#loadingCommentsInfo").remove();
+        }
+
+        // initial get
+        function initialGetComments() {
+            var request;
+            if (request) {
+                request.abort();
+            }
+
+            var prodId = @Model.Product.ProductId;
+            var page = 1;
+            var take = 2;
+            var productCommentsId = $("#viewProductId").text();
+            var reqUrl = "/products/"+productCommentsId+"/comments?take="+take+"&page="+page+"";
+            console.log(reqUrl);
+
+            appendLoadingInfo('commentSection');
+            request = $.ajax({
+                url: reqUrl,
+                type: "GET",
+                dataType: "json"
+            });
+            request.done(function (response) {
+                parseComments(response);
+                if (response.nextResultSetUrl) {
+                    $("#commentSection").append(
+                    "<div class=\"row\" id=\"parentCommentRow\">" +
+                        "<div class=\"col-lg-8 col-lg-offset-2 col-sm-offset-1\">" +
+                            //"<a id=\"loadTopLevelComments\" href=\"/comments/find/?productId=5022&commentId=&take=1&page=2\">" +
+                            "<a id=\"loadTopLevelComments\" href=\"/products/${prodId}/comments?take=${take}&page=${page}\">" +
+                            "<span class=\"glyphicon glyphicon-plus-sign\"></span> More comments..." +
+                            "</a>" +
+                        "</div>" +
+                    "</div>");
+                    $("#loadTopLevelComments").click(function (event) {
+                        event.preventDefault();
+                        $("#loadTopLevelComments").css("display", "none");
+                        appendLoadingInfo('parentCommentRow');
+                        var request;
+                        if (request) {
+                            request.abort();
+                        }
+                        var hrefTopLevel = $("#loadTopLevelComments").attr('href');
+                        request = $.ajax({
+                            url: hrefTopLevel,
+                            type: "GET",
+                            dataType: "json"
+                        });
+                        request.done(function (response) {
+                            parseComments(response);
+                            if (response.nextResultSetUrl) {
+                                $("#loadTopLevelComments").attr('href', response.nextResultSetUrl);
+                                $("#parentCommentRow").appendTo("#commentSection");
+                            } else {
+                                $("#loadTopLevelComments").css("display", "none");
+                                $("div").remove("#parentCommentRow");
+                            }
+                        })
+                        request.always(function () {
+                            $("#loadTopLevelComments").css("display", "");
+                            removeLoadingInfo();
+                        })
+                    });
+                }
+            });
+            request.always(function () {
+                removeLoadingInfo();
+            });
+        }
+
+        // parsing comments
+        function parseComments(response) {
+            var pageSize = 1;
+            var takeSize = 2;
+            console.log(response);
+            $.each(response.content.Comments, function (index, value) {
+                $("#commentSection").append(
+                    "<div class=\"row\" style=\"margin-bottom:10px;\">" +
+                        "<div id=\"" + value.Id + "\" class=\"col-lg-10 col-lg-offset-1\">" +
+                            "<div style=\"padding-bottom:15px;\">" +
+                                "<div class=\"col-lg-1 col-sm-1 col-xs-1\" style=\"text-align:right;margin-top:5px;padding-left:0px;\">" +
+                                    "<img class=\"img-circle\" src=\"https://cdn.pixabay.com/photo/2021/10/21/14/03/cats-6729197_960_720.jpg\" style=\"height:50px;width:50px;\" />" +
+                                "</div>" +
+                                "<div>" +
+                                   @*"<b><a href=\"#\">" + value.Username + "</a> (@DateTime.UtcNow)</b>" +*@
+                                   "<b><a href=\"#\">" + value.Username + "</a> (" + value.PostedDate + ")</b>" +
+                                "</div>" +
+                                "<div class=\"col-lg-10\" style=\"margin:0px;padding:0px;\">" +
+                                        "" + value.CommentText + "" +
+                                "</div>" +
+                                "<div class=\"col-lg-4\" style=\"padding-left:0;\">" +
+                                    "<span class=\"glyphicon glyphicon-thumbs-up\" style=\"padding-left:2px;\"></span>" +
+                                    "<span> 123</span>" +
+                                    "<span class=\"glyphicon glyphicon-thumbs-down\" style=\"padding-left:10px;\"></span>" +
+                                    "<span> 1234</span>" +
+                                    "<a href=\"#\" style=\"margin-left:15px;\"><span class=\"glyphicon glyphicon-comment\"></span> Reply</a>" +
+                                "</div>" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>"
+                );
+                if (value.TotalReplies > 0) {
+                    $("#" + value.Id).append(
+                        "<div class=\"col-lg-10 col-lg-offset-1 col-sm-offset-1\" style=\"padding-left:0px;\">" +
+                            //"<a id=\"cmt" + value.Id + "\" href=\"/comments/find/?productId=5022&commentId=" + value.Id + "&take=5&page=1\">" +
+                            "<a id=\"cmt" + value.Id + "\" href=\"/products/"+ @Model.Product.ProductId +"/comments?commentId="+ value.Id +"&take=2&page=1\">" +
+                            "<span class=\"glyphicon glyphicon-chevron-down\"></span> Show replies</a>" +
+                        "</div>"
+                    );
+                    $("#cmt" + value.Id).click(function (event) {
+                        event.preventDefault();
+                        appendLoadingInfo(value.Id);
+                        $("#cmt" + value.Id).css("display", "none");
+                        var request;
+                        if (request) {
+                            request.abort();
+                        }
+                        var cmtId = value.Id;
+                        var hrefVal = $("#cmt" + cmtId).attr('href');
+                        request = $.ajax({
+                            url: hrefVal,
+                            type: "GET",
+                            dataType: "json"
+                        });
+                        request.done(function (response) {
+                            $.each(response.content.Comments, function (index, value) {
+                                $("#cmt" + cmtId).before(
+                                    "<div class=\"row\" style=\"margin-bottom:10px;margin-top:15px;\">" +
+                                        "<div id=\"" + value.Id + "\" class=\"col-lg-12\">" +
+                                            "<div style=\"padding-bottom:15px;\">" +
+                                                "<div class=\"col-lg-1 col-sm-1 col-xs-1\" style=\"text-align:right;margin-top:5px;padding-left:0px;\">" +
+                                                    "<img class=\"img-circle\" src=\"https://cdn.pixabay.com/photo/2021/10/21/14/03/cats-6729197_960_720.jpg\" style=\"height:50px;width:50px;\" />" +
+                                                "</div>" +
+                                                "<div>" +
+                                                   @*"<b><a href=\"#\">" + value.Username + "</a> (@DateTime.UtcNow)</b>" +*@
+                                                   "<b><a href=\"#\">" + value.Username + "</a> (" + value.PostedDate + ")</b>" +
+                                                "</div>" +
+                                                "<div class=\"col-lg-10\" style=\"margin:0px;padding:0px;\">" +
+                                                        "" + value.CommentText + "" +
+                                                "</div>" +
+                                                "<div class=\"col-lg-4\" style=\"padding-left:0;\">" +
+                                                    "<span class=\"glyphicon glyphicon-thumbs-up\" style=\"padding-left:2px;\"></span>" +
+                                                    "<span> 123</span>" +
+                                                    "<span class=\"glyphicon glyphicon-thumbs-down\" style=\"padding-left:10px;\"></span>" +
+                                                    "<span> 1234</span>" +
+                                                    "<a href=\"#\" style=\"margin-left:15px;\"><span class=\"glyphicon glyphicon-comment\"></span> Reply</a>" +
+                                                "</div>" +
+                                            "</div>" +
+                                        "</div>" +
+                                    "</div>"
+                                );
+                                $("#cmt" + cmtId).css("background-color", "");
+                                $("#cmt" + cmtId).attr("href", response.nextResultSetUrl);
+                            })
+                            if (!response.nextResultSetUrl) {
+                                $("#cmt" + cmtId).remove();
+                            } else {
+                                $("#cmt" + cmtId).css("display", "");
+                            }
+                        })
+                        request.always(function () {
+                            removeLoadingInfo();
+                        })
+                    });
+                }
+            });
+        }
+
+        function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+            return false;
+        };
+</script>
+}

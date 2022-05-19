@@ -1,0 +1,63 @@
+﻿@model CoolBuyer.Client.Common.ClientModels.Account.UserLoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<br />
+<br />
+
+@if (Request.IsAuthenticated)
+{
+    <div style="text-align:center;">
+        <h3>You are already logged in!</h3>
+    </div>
+
+    <br />
+}
+else
+{
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <section id="loginForm">
+                @using (Html.BeginForm("login", "account", new { returnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Username, new { @class = "col-md-2 col-md-offset-1 control-label" })
+                        <div class="col-md-8">
+                            @Html.TextBoxFor(m => m.Username, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Username, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Password, new { @class = "col-md-2 col-md-offset-1 control-label" })
+                        <div class="col-md-8">
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-2 col-md-offset-3">
+                            <input type="submit" value="Log in" class="btn btn-primary" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-9 col-md-offset-3">
+                            Don't have an account? Click <a href="/account/register">here</a> to register.
+                        </div>
+                    </div>
+                }
+            </section>
+        </div>
+    </div>
+}
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

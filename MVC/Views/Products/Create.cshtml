@@ -1,0 +1,172 @@
+﻿@model CoolBuyer.Client.Common.ClientModels.Products.NewProductViewModel
+
+@{
+    ViewBag.Title = "Create new item";
+}
+
+<br />
+
+<div class="alert alert-info" role="alert">
+    Fields marked with <span style="color:red;">*</span> are required.
+</div>
+
+<hr />
+
+@using (Html.BeginForm(
+                    "create", "products",
+                    null,
+                    FormMethod.Post,
+                    new { enctype = "multipart/form-data", @class = "form-horizontal", @role = "form" }
+                    ))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        @Html.ValidationSummary(false, "", new { @class = "col-md-8 col-md-offset-2 text-danger" })
+    </div>
+
+    <div class="row" style="">
+        @Html.LabelFor(m => m.Images, new { @class = "col-lg-2 control-label" })
+        <div class="col-lg-10 col-lg-offset-2" style="margin:auto;">
+            <div class="row">
+                @for (int i = 0; i < 8; i++)
+                {
+                    <div class="col-lg-3" style="padding:0px;position:relative;">
+
+                        <input type="file" id="@($"inputNr{i}")" name="@($"Images[{i}]")" style="display:none;"
+                               onchange="document.getElementById('@($"img{i}")').src = window.URL.createObjectURL(this.files[0]);"
+                               oninput="checkInput('@($"inputNr{i}")', '@($"btn{i}")')" />
+
+                        <label for="@($"inputNr{i}")" style="padding:5px; cursor:pointer;width:100%;height:250px;max-height:100%;max-width:100%;" />
+
+                        <img id="@($"img{i}")" name="@($"Images[{i}]")" src="~/Resources/cool-buyer-logo.png" 
+                             style="max-height:100%;max-width:100%; width:100%;height:100%;" />
+
+                        <button class="btn btn-primary" id="@($"btn{i}")" type="button" style="position: absolute;top: 6px;right: 6px;cursor: pointer;"
+                                onclick="removeImage('@($"img{i}")', '@($"inputNr{i}")')"
+                                onabort="disableButton('@($"btn{i}")')"
+                                oncancel="disableButton('@($"btn{i}")')">
+                            x
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    
+
+    <div class="form-group">
+        @Html.Label("CategoryId", "Category", new { @class = "col-md-2 control-label required" })
+        <div class="col-md-10">
+            @Html.DropDownList("CategoryId", new List<SelectListItem>(), null, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("SubcategoryId", "Subcategory", new { @class = "col-md-2 control-label required" })
+        <div class="col-md-10">
+            @Html.DropDownList("SubcategoryId", new List<SelectListItem>(), null, new { @class = "form-control" })
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Title, new { @class = "col-md-2 control-label required" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Title, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Price, new { @class = "col-md-2 control-label required" })
+        <div class="col-md-10">
+            @Html.EditorFor(m => m.Price, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Description, new { @class = "col-md-2 control-label required" })
+        <div class="col-md-10">
+            @Html.TextAreaFor(m => m.Description, new { @style = "width:100%;height:500px;max-width:100%;max-height:500px;overflow:scroll;", @id = "Description" })
+            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" class="btn btn-primary" value="Submit" />
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Scripts/tinymce/tinymce.js"></script>
+    <script>
+            tinyMCE.init({
+                selector: '#Description',
+                plugins: [
+                  'autolink link lists image charmap hr anchor',
+                  'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime nonbreaking',
+                  'table contextmenu directionality template paste textcolor emoticons media'
+                ],
+                toolbar: "newdocument | undo redo | styleselect | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist indent outdent | link image media table | emoticons | forecolor backcolor",
+                resize: false,
+                statusbar: false
+            });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#SubcategoryId").attr("disabled", true);
+
+            var cats = "<option value='1'>Category 1</option><option value='2'>Category 2</option><option value='3'>Category 3</option>";
+            var cat1opts = "<option value='1'>Subcategory 1</option><option value='2'>Subcategory 2</option>";
+            var cat2opts = "<option value='3'>Subcategory 3</option><option value='4'>Subcategory 4</option>";
+            var cat3opts = "<option value='5'>Subcategory 5</option><option value='6'>Subcategory 6</option>";
+
+            $("#CategoryId").append(cats);
+
+            $("#CategoryId").change(function () {
+                $("#SubcategoryId").removeAttr("disabled");
+                var catId = $(this).val();
+                if (catId == "1") {
+                    $("#SubcategoryId").html("<option value='1'>Subcategory 1</option><option value='2'>Subcategory 2</option>");
+                } else if (catId == "2") {
+                    $("#SubcategoryId").html("<option value='3'>Subcategory 3</option><option value='4'>Subcategory 4</option>");
+                } else if (catId == "3") {
+                    $("#SubcategoryId").html("<option value='5'>Subcategory 5</option><option value='6'>Subcategory 6</option>");
+                } 
+            });
+        });
+    </script>
+
+    <script>
+        function disableButton(buttonId) {
+            var inp = document.getElementById(buttonId);
+            inp.style.display = "none";
+        }
+        function removeImage(imageId, inputId) {
+            var image = document.getElementById(imageId);
+            image.src = "https://cdn.pixabay.com/photo/2021/09/26/09/54/beans-6656979_960_720.jpg";
+            var inp = document.getElementById(inputId);
+            inp.value = null;
+        }
+        function checkInput(inputId, buttonId) {
+            var myInput = document.getElementById(inputId);
+            var disabled = document.getElementById(buttonId);
+            if (myInput && myInput.value) {
+                disabled.style.display = "inline-block";
+            } else {
+                disabled.style.display = "none";
+            }
+        }
+    </script>
+
+}

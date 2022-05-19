@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title - Cool Buyer</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="@Url.Content("~/content/favicon.ico")" />
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/Site.css" rel="stylesheet" />
+    
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <!-- #region mainNavBar -->
+            <nav id="mainNavBar" class="navbar navbar-inverse navbar-fixed-top col-lg-12 col-lg-offset-0" role="navigation">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
+                    <!-- #region logo -->
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a href="/" style="font-family:Broadway;padding:0px;">
+                            <img src="~/Resources/cool-buyer-logo.png" style="height:50px;width:100%;padding:15px;width:auto;" />
+                            <span style="padding:0px 10px 0px 0px;">CoolBuyer</span>
+                        </a>
+                    </div>
+                    <!-- #endregion -->
+                    <div class="collapse navbar-collapse navbar-ex1-collapse">
+                        <!-- #region rightSideLinks -->
+                        @Html.Partial("_LoginPartial")
+                        <!-- #endregion -->
+                        <!-- #region searchForm -->
+                        <ul class="nav navbar-nav" style="float:none;margin: 0 auto;display:table;table-layout:fixed;">
+                            <form class="navbar-form navbar-right" role="search" action="/products/search" method="get">
+                                <div class="input-group" id="prodSearchInput">
+                                    <input type="text" style="max-height:34px;" name="SearchString" class="form-control" id="searchAction" placeholder="Search...">
+                                    <div class="input-group-btn">
+                                        <button class="btn btn-primary" type="submit" style="max-height:34px;">
+                                            <span class="glyphicon glyphicon-search "></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </ul>
+                        <!-- #endregion -->
+                    </div>
+                </div>
+            </nav>
+            <!-- #endregion -->
+        </div>
+    </div>
+
+    <div class="container body-content" style="border: 1px solid #808080;">
+        @RenderBody()
+        <hr />
+        <footer style="text-align:center;">
+            <p>&copy; @DateTime.Now.Year - Cool Buyer Online Shop</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(".navbar-collapse").css({ maxHeight: $(window).height() - $(".navbar-header").height() + "px" });
+    </script>
+
+</body>
+</html>
