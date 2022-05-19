@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.props')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{82D00B4A-870A-49B7-B6B9-D2112FBD3F08}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CoolBuyer.Server.BusinessLogic</RootNamespace>
+    <AssemblyName>CoolBuyer.Server.BusinessLogic</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\Attributes\ValidateHTMLAttribute.cs" />
+    <Compile Include="Common\Constants\Currency.cs" />
+    <Compile Include="Common\Constants\ItemExpirationDaysForAccountType.cs" />
+    <Compile Include="Common\Constants\UserAccountType.cs" />
+    <Compile Include="Common\DTOs\ApplicationUserDTO.cs" />
+    <Compile Include="Common\DTOs\NewApplicationUserDTO.cs" />
+    <Compile Include="Common\DTOs\ProductIndexPageDetailsBasicInfoDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Write\AddProductToFavoritesDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Write\LikeDislikeProductDTO.cs" />
+    <Compile Include="Common\DTOs\ResponseModels\IndexPageProductDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\ResponseModels\ProductDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\ProductIndexDTO.cs" />
+    <Compile Include="Common\DTOs\Read\FilterProductCommentsDTO.cs" />
+    <Compile Include="Common\DTOs\Read\ProductCommentDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Read\ProductsSearchOptionsDTO.cs" />
+    <Compile Include="Common\DTOs\RegisterNewUserDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Read\ProductImageDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Read\ProductUpdateDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Write\NewProductDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Write\CreateProductImageDTO.cs" />
+    <Compile Include="Common\DTOs\Request\Write\UpdateProductDTO.cs" />
+    <Compile Include="Common\DTOs\ResponseModels\ProductSearchDTO.cs" />
+    <Compile Include="Common\DTOs\ResponseModels\UserFavoriteDTO.cs" />
+    <Compile Include="Common\DTOs\UserCommentDTO.cs" />
+    <Compile Include="Common\DTOs\UserFavoriteDTO.cs" />
+    <Compile Include="Common\DTOs\UserProductsDTO.cs" />
+    <Compile Include="Common\DTOs\ResponseModels\UserProfileIndexDetailsDTO.cs" />
+    <Compile Include="Common\DTOs\Write\NewProductCommentDTO.cs" />
+    <Compile Include="Common\DTOs\Write\ProductCommentReactionDTO.cs" />
+    <Compile Include="Common\DTOs\Write\UpdateProductCommentDTO.cs" />
+    <Compile Include="Common\Exceptions\AccountConfirmationFailedException.cs" />
+    <Compile Include="Common\Exceptions\AccountNotConfirmedException.cs" />
+    <Compile Include="Common\Exceptions\CreateNewUserException.cs" />
+    <Compile Include="Common\Exceptions\DbException.cs" />
+    <Compile Include="Common\Exceptions\ModelValidationException.cs" />
+    <Compile Include="Common\Exceptions\NotFoundException.cs" />
+    <Compile Include="Common\Exceptions\OperationNotAllowedException.cs" />
+    <Compile Include="Common\Exceptions\UnauthorizedException.cs" />
+    <Compile Include="Common\Extensions\DbContextMultipleResultSet.cs" />
+    <Compile Include="Common\Logic\ConvertToDataTable.cs" />
+    <Compile Include="Common\Logic\FileManager.cs" />
+    <Compile Include="Common\Logic\GuidGenerator.cs" />
+    <Compile Include="Common\Logic\ModelValidator.cs" />
+    <Compile Include="Common\Managers\ITokenManager.cs" />
+    <Compile Include="Common\Managers\IUserManager.cs" />
+    <Compile Include="Common\Models\AccountType.cs" />
+    <Compile Include="Common\Models\CategoryModel.cs" />
+    <Compile Include="Common\Models\CommentLikeDislikeModel.cs" />
+    <Compile Include="Common\Models\ExchangeRate.cs" />
+    <Compile Include="Common\Models\FavoriteProductModel.cs" />
+    <Compile Include="Common\Models\ProductCommentModel.cs" />
+    <Compile Include="Common\Models\ProductImage.cs" />
+    <Compile Include="Common\Models\ProductLikeDislikeModel.cs" />
+    <Compile Include="Common\Models\ProductModel.cs" />
+    <Compile Include="Common\Models\SectionModel.cs" />
+    <Compile Include="Common\Models\SubcategoryModel.cs" />
+    <Compile Include="Common\Models\UserModel.cs" />
+    <Compile Include="Common\Security\DataProtection\AesEncryption.cs" />
+    <Compile Include="Common\Security\DataProtection\IDataProtector.cs" />
+    <Compile Include="Database\CoolBuyerDbContext.cs" />
+    <Compile Include="Database\ICoolBuyerDbContext.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AesCSPSymmetricEncryptionService.cs" />
+    <Compile Include="Services\EmailMessagingService.cs" />
+    <Compile Include="Services\ExchangeRateService.cs" />
+    <Compile Include="Services\FavoritesService.cs" />
+    <Compile Include="Services\IAccountService.cs" />
+    <Compile Include="Services\IExchangeRateService.cs" />
+    <Compile Include="Services\ICurrentUserService.cs" />
+    <Compile Include="Services\IEmailService.cs" />
+    <Compile Include="Services\IFavoritesService.cs" />
+    <Compile Include="Services\IProductCommentService.cs" />
+    <Compile Include="Services\IProductService.cs" />
+    <Compile Include="Services\IProfileService.cs" />
+    <Compile Include="Services\ISymmetricCryptographyService.cs" />
+    <Compile Include="Services\ITokenGeneratorService.cs" />
+    <Compile Include="Services\IUserService.cs" />
+    <Compile Include="Services\IUserUploadsPathsService.cs" />
+    <Compile Include="Services\ProductCommentService.cs" />
+    <Compile Include="Services\ProductService.cs" />
+    <Compile Include="Services\UploadPathsService.cs" />
+    <Compile Include="Services\UserService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Common\DTOs\Account\" />
+    <Folder Include="Common\DTOs\Product\" />
+    <Folder Include="Common\DTOs\Profile\" />
+    <Folder Include="Common\DTOs\User\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+  <Import Project="..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\netcoreapp3.0\EntityFramework.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
