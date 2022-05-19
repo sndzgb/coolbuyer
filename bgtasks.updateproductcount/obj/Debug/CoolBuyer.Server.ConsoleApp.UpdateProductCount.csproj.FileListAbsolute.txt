@@ -1,1 +1,0 @@
-D:\programiranje-projekti\C#\Visual Studio 2015\Projects\SQLDummyDataGenerator\CoolBuyer.Server.ConsoleApp.UpdateProductCount\obj\Debug\CoolBuyer.Server.ConsoleApp.UpdateProductCount.csprojResolveAssemblyReference.cache
